@@ -1,0 +1,21 @@
+name = "MattilaSjolin"
+defaultTargets = ["MattilaSjolin"]
+
+[leanOptions]
+autoImplicit = false
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+# same pin as openai/math lean/lake-manifest.json
+rev = "d13f23b723b8a846827a245b89c10fc7d3f11612"
+
+# OpenAI's Lean modules this project builds on (Frostman, Fourier energy, sphere stationary phase).
+# Populate with `python3 scripts/fetch_oai.py <openai-math-checkout>`; not tracked in git.
+[[lean_lib]]
+name = "OAI"
+srcDir = "oai-src"
+globs = ["OAI.+"]
+
+[[lean_lib]]
+name = "MattilaSjolin"

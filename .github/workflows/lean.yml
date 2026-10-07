@@ -1,0 +1,28 @@
+name: Lean build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch the pinned OpenAI Lean files (Mathlib-only closure)
+        run: |
+          mkdir ../openai-math && cd ../openai-math
+          git init -q && git remote add origin https://github.com/openai/math.git
+          git fetch -q --depth 1 origin adc7f1241b42e322a6451854ab7e4b4c146bf78a
+          git checkout -q FETCH_HEAD
+          cd "$GITHUB_WORKSPACE" && python3 scripts/fetch_oai.py ../openai-math
+      - uses: leanprover/lean-action@v1
+        with:
+          # --wfail: any warning (including a `sorry`) fails the build
+          build-args: "MattilaSjolin --wfail"
+          test: false
+          lint: false
+      - name: Check axioms (only propext, Classical.choice, Quot.sound allowed)
+        run: lake env lean verify/Axioms.lean 2>&1 | python3 verify/check_axioms.py verify/Axioms.lean
